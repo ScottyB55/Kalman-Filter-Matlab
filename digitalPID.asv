@@ -3,9 +3,10 @@ close all
 clc
 
 % PID gains
-Kp = 2000;  % proportional
-Kd = 240;   % derivative
-Ki = 16000;   % integral
+Kp = 100;  % proportional
+Kd = 0;   % derivative
+Ki = 0;   % integral
+
 
 deltaT = 0.01;         % in seconds
 totalTime = 3;         % also in seconds
@@ -53,10 +54,6 @@ for step=2:N
   thetadotdot(step) = F/(m*l)-cos(theta(step-1))*g/l - friction*thetadot(step-1);
   thetadot(step) = thetadot(step-1)+thetadotdot(step)*deltaT;
   theta(step) = theta(step-1)+thetadot(step)*deltaT;
-
-  if theta(step) > theta_max
-      theta_max = theta(step);
-  end
 end
 
 % Now let's see how it looks
@@ -76,8 +73,7 @@ plot(times,ones(1,N)*pi*10/180,'r'); % 10 degree overshoot
 plot(times,-ones(1,N)*pi*10/180,'r'); % 10 degree undershoot
 xlabel('Time [s]');
 ylabel('Angular position [rad]');
-title(sprintf('Max Angle = %.2f°. Final Angle = %.2f°', ...
-            theta_max*180/pi, theta(N)*180/pi));
+
 
 % Second subplot is for the force applied
 subplot(2,1,2);

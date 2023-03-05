@@ -17,8 +17,8 @@ arr_Rand_Noise = randn(100, 1);
 % Define the different settings
 settings = [struct('Q', 4, 'R', 5, 'initial_p_estimate', 10)
             struct('Q', 400, 'R', 5, 'initial_p_estimate', 10)
-            struct('Q', 4, 'R', 500, 'initial_p_estimate', 10)
-            struct('Q', 4, 'R', 5, 'initial_p_estimate', 1000)];
+            struct('Q', 4, 'R', 500, 'initial_p_estimate', 10)];
+            %struct('Q', 4, 'R', 5, 'initial_p_estimate', 1000)];
 
 % Cycle through the different settings
 N_settings = length(settings);
@@ -32,14 +32,12 @@ K = zeros(N_settings, N_samples);
 P = zeros(N_settings, N_samples);
 
 % Generate process and measurement noise for the first setting
-
 Q = settings(1).Q;
 R = settings(1).R;
 w = sqrt(Q) * arr_Rand_Noise;
-% Generate measurement noise
 v = sqrt(R) * arr_Rand_Noise;
 
-% Generate the Simulated Real State and Measurements
+% Generate the Simulated Real State and Measurements for the first setting
 x_real(1) = initial_state_estimate;
 % Simulate across time
 for k = 1:N_samples
@@ -50,6 +48,7 @@ for k = 1:N_samples
     y_meas(k) = C*x_real(k) + D*Uk + v(k);
 end
 
+% Perform Kalman filter estimation for each setting
 for i = 1:N_settings
     Q = settings(i).Q;
     R = settings(i).R;
@@ -89,7 +88,6 @@ end
 
 % Plot the results
 figure;
-% colors = ['r', 'g', 'b'];
 hold on;
 plot(time, x_real(:));
 for i = 1:N_settings
