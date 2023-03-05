@@ -58,13 +58,13 @@ for i = 1:N_settings
             % Pˆk|k−1 = APˆk−1|k−1A^T + Q
                 P = A*P*A' + Q;
             % y˜k = yk − Cxˆk|k−1
-                y_est(i,k) = y_meas(i,k) - C * x_est(i,k);
+                y_est(i,k) = y(i,k) - C * x_est(i,k);
             % Sk = CPˆk|k−1C^T + R
                 S = C*P*C' + R;
             % Kk = Pˆk|k−1C^T S^−1
                 K = P*C'/S;
             % xˆk|k = ˆxk|k−1 + Kky˜k
-                x_est(i,k) = x_est(i,k) + K*y_est(i,k);
+                x_est(i,k) = x_est(i,k) + K*y(i,k);
             % Pk|k = (I − KkC)Pk|k−1(I − KkC)^T + KkRkK^T
                 P = (eye(1) - K*C)*P*(eye(1) - K*C)' + K*R*K';
     end
@@ -81,7 +81,7 @@ end
 title('True States & Estimated States');
 xlabel('Time (seconds)');
 ylabel('Water');
-legend('Real State', 'Estimated State 1', 'Estimated State 2');
+legend('Real State', 'Estimated State 1', 'Estimated State Setting 2');
 hold off;
 
 % Plot the measurement data
