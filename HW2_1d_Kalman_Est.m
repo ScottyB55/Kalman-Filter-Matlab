@@ -47,9 +47,9 @@ for i = 1:N_settings
     for k = 1:N_samples
         % True system dynamics with process noise
         if (k ~= N_samples)
-            x_real(i,k+1) = A*x(i,k) + B*Uk + w(k); end
+            x_real(i,k+1) = A*x_real(i,k) + B*Uk + w(k); end
         % Measured output with measurement noise
-        y_meas(i,k) = C*x(i,k) + D*Uk + v(k);
+        y_meas(i,k) = C*x_real(i,k) + D*Uk + v(k);
 
         %% Kalman Filter Equations
             % xˆk|k−1 = Axˆk + Buk
@@ -57,13 +57,13 @@ for i = 1:N_settings
             % Pˆk|k−1 = APˆk−1|k−1A^T + Q
                 P = A*P*A' + Q;
             % y˜k = yk − Cxˆk|k−1
-                y_est(i,k) = y(i,k) - C * x_est(i,k);
+                y_est(i,k) = y_meas(i,k) - C * x_est(i,k);
             % Sk = CPˆk|k−1C^T + R
                 S = C*P*C' + R;
             % Kk = Pˆk|k−1C^T S^−1
                 K = P*C'/S;
             % xˆk|k = ˆxk|k−1 + Kky˜k
-                x_est(i,k) = x_est(i,k) + K*y(i,k);
+                x_est(i,k) = x_est(i,k) + K*y_est(i,k);
             % Pk|k = (I − KkC)Pk|k−1(I − KkC)^T + KkRkK^T
                 P = (eye(1) - K*C)*P*(eye(1) - K*C)' + K*R*K';
     end
