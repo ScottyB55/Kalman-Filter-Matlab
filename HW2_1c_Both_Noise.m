@@ -19,10 +19,10 @@ y = zeros(3, N);
 arr_Rand_Noise = randn(100, 1);
 
 % Cycle through the 3 different settings
-for i = 1:3
+for i = 1:1
     if i == 1
-        Q = 0;
-        R = 0;
+        Q = 4;
+        R = 5;
     elseif i == 2
         Q = 4;
         R = 0;
@@ -54,8 +54,8 @@ end
 
 % Plot the results
 figure;
-plot(time, y(1,:), '-r', time, y(2,:), '-g', time, y(3,:), '-b');
-legend('Q = 0 & R = 0', 'Q = 4 & R = 0', 'Q = 0 & R = 5');
-title('Y(k) Measured Output, Constant Input U(k) = 0.1 starting at 10, Gain 3');
+plot(time, y(1,:), '-r');
+legend('Q = 4 & R = 5');
+title('Y(k) Measured Output, Constant Input U(k) = 0.1, Start at 10 with gain 3');
 xlabel('Time (seconds)');
 ylabel('Water Measured, Gain of 3');

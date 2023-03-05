@@ -1,27 +1,24 @@
-% Define system matrices
-
+% Define system
 A = 1;
 B = 2;
 C = 3;
 D = 0;
-
 Uk = 0.1;   % real input trickle
-
-% Initialize state estimate and covariance estimate
-% P = 10;
+initial_state_estimate = 10;
 
 % Simulate system dynamics and measurement
 N = 100;
-timestep = 2;               % time step duration in seconds
+timestep = B;               % time step duration in seconds
 time = timestep * (0:N-1);  % time axis for plot
 
-% create 2D array
+% Create 2D placeholder array for 3 different settings and N measured outputs
 x = zeros(3, N);
-
 y = zeros(3, N);
 
+% Create the random noise
 arr_Rand_Noise = randn(100, 1);
 
+% Cycle through the 3 different settings
 for i = 1:3
     if i == 1
         Q = 0;
@@ -41,28 +38,24 @@ for i = 1:3
     v = sqrt(R) * arr_Rand_Noise;
 
     % Initial state estimate
-    x(i,1) = 10;
+    x(i,1) = initial_state_estimate;
     
-
+    % Simulate across time
     for k = 1:N-1
         % True system dynamics with process noise
         x(i,k+1) = A*x(i,k) + B*Uk + w(k);
         % Measured output with measurement noise
         y(i,k) = C*x(i,k) + D*Uk + v(k);
-        % Update state estimate and covariance estimate using Kalman filter equations
-        % K = P*H'/(H*P*H' + R);
-        % x(k+1) = A*x(k) + B*Uk + K*(y_meas(k) - H*(A*x(k) + B*Uk));
-        % P = (eye(1) - K*H)*P*(eye(1) - K*H)' + K*R*K';
     end
 
     % cover the last data point
     y(i,N) = C*x(i,N) + D*Uk + v(N);
 end
 
-% Plot results
+% Plot the results
 figure;
 plot(time, y(1,:), '-r', time, y(2,:), '-g', time, y(3,:), '-b');
 legend('Q = 0 & R = 0', 'Q = 4 & R = 0', 'Q = 0 & R = 5');
-title('Kalman Filter Y(k) Output Simulation with Constant Input U(k) = 0.1 starting at 10, Gain 3');
+title('Y(k) Measured Output, Constant Input U(k) = 0.1, Start at 10 with gain 3');
 xlabel('Time (seconds)');
 ylabel('Water Measured, Gain of 3');
