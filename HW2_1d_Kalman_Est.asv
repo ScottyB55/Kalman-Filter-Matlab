@@ -1,0 +1,79 @@
+% Define system
+A = 1;
+B = 2;
+C = 3;
+D = 0;
+Uk = 0.1;   % real input trickle
+initial_state_estimate = 10;
+initial_p_estimate = 10;
+
+% Simulate system dynamics and measurement
+N_samples = 100;
+timestep = B;               % time step duration in seconds
+time = timestep * (0:N_samples-1);  % time axis for plot
+
+% Create the random noise
+arr_Rand_Noise = randn(100, 1);
+
+% Define the different settings
+settings = [struct('Q', 4, 'R', 5, 'initial_p_estimate', 10)
+            struct('Q', 4, 'R', 5, 'initial_p_estimate', 1000)];
+
+% Cycle through the different settings
+N_settings = length(settings);
+
+% Create 2D placeholder array for 3 different settings and N measured outputs
+x_real = zeros(N_settings, N_samples);
+y_meas = zeros(N_settings, N_samples);
+x_est = zeros(N_settings, N_samples);
+y_est = zeros(N_settings, N_samples);
+
+for i = 1:N_settings
+    Q = settings(i).Q;
+    R = settings(i).R;
+    initial_p_estimate = settings(i).initial_p_estimate;
+    
+    % Generate process noise
+    w = sqrt(Q) * arr_Rand_Noise;
+
+    % Generate measurement noise
+    v = sqrt(R) * arr_Rand_Noise;
+
+    % Initial state estimate
+    x_real(i,1) = initial_state_estimate;
+    x_est(i,1) = initial_state_estimate;
+    P = initial_p_estimate;
+    
+    % Simulate across time
+    for k = 1:N_samples
+        % True system dynamics with process noise
+        if (k ~= N_samples)
+            x_real(i,k+1) = A*x(i,k) + B*Uk + w(k); end
+        % Measured output with measurement noise
+        y_meas(i,k) = C*x(i,k) + D*Uk + v(k);
+
+        %% Kalman Filter Equations
+            % xˆk|k−1 = Axˆk + Buk
+                x_est(i,k) = A*x_est(i,k) + B*Uk;
+            % Pˆk|k−1 = APˆk−1|k−1A^T + Q
+                P = A*P*A' + Q;
+            % y˜k = yk − Cxˆk|k−1
+                y_est(i,k) = y(i,k) - C * x_est(i,k);
+            % Sk = CPˆk|k−1C^T + R
+                S = C*P*C' + R;
+            % Kk = Pˆk|k−1C^T S^−1
+                K = P*C'/S;
+            % xˆk|k = ˆxk|k−1 + Kky˜k
+                x_est(i,k) = x_est(i,k) + K*y(i,k);
+            % Pk|k = (I − KkC)Pk|k−1(I − KkC)^T + KkRkK^T
+                P = (eye(1) - K*C)*P*(eye(1) - K*C)' + K*R*K';
+    end
+end
+
+% Plot the results
+figure;
+plot(time, x_real(1,:), '-r', time, x_est(1,:), '-g');
+legend('Real State', 'Estimated State');
+title('Process Noise Q = 4 & Measurement Noise R = 5');
+xlabel('Time (seconds)');
+ylabel('Water Measured, Gain of 3');
